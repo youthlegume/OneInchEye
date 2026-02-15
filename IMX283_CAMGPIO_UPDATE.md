@@ -13,18 +13,21 @@ As a result, the camera-enable line was not being actively asserted for this boa
 
 ## What was changed
 
-In `imx283-overlay.dts`, under `fragment@3` (`target = <&cam1_reg>`), this was added:
+In `imx283-overlay.dts`, under `fragment@3` (`target = <&cam1_reg>`), the following was added:
 
 ```dts
 /* CM4 pin 97 (CAMGPIO / CameraGPIO) */
 gpio = <&expgpio 5 0>;
+regulator-always-on;
+regulator-boot-on;
 ```
 
-This maps the camera regulator enable to CM4 `CAM_GPIO` (`&expgpio 5`), which is the line routed to CAM1 FFC `CAM_EN` on Ochin CM4v2.
+- **`gpio = <&expgpio 5 0>`** — Maps the camera regulator enable to CM4 `CAM_GPIO` (pin 97), the line routed to CAM1 FFC `CAM_EN` on Ochin CM4v2.
+- **`regulator-always-on` / `regulator-boot-on`** — Ensures `cam1_reg` is enabled at boot so CAM_EN goes high and the sensor (and IMU) get power. Without these, the regulator can stay disabled and CAM_EN stays 0 V.
 
 ## Will GPIO now go high to 3.3 V?
 
-**Yes — when `cam1_reg` is enabled, this line is driven active-high.**
+**Yes — with the patched overlay, `cam1_reg` is enabled at boot, so CAM_EN is driven high (~3.3 V) as soon as the overlay loads.**
 
 Why:
 
@@ -61,8 +64,9 @@ dtoverlay=imx283,always-on
 From your computer, SSH into the Pi, then run:
 
 ```bash
-# 1. Clone this repo on the Pi (or copy the repo onto the Pi some other way)
-git clone https://github.com/YOUR_USER/OneInchEye.git
+# 1. Clone this repo on the Pi (CAMGPIO fix branch). Use cd ~ so you get ~/OneInchEye, not nested OneInchEye/OneInchEye
+cd ~
+git clone -b cursor/imx283-camera-enable-db1c https://github.com/youthlegume/OneInchEye.git
 cd OneInchEye
 
 # 2. Install device tree compiler and build the overlay
@@ -91,7 +95,22 @@ Save and exit (in nano: Ctrl+O, Enter, Ctrl+X), then reboot:
 sudo reboot
 ```
 
-After reboot, the CAM_EN line should go high when the camera is in use. If the script fails to download the overlay, see “How to apply on the Pi” below for manual steps.
+After reboot, the CAM_EN line should go high when the camera is in use.
+
+**If you see `env: 'bash\r': No such file or directory`:** the script had Windows line endings. On the Pi run `sed -i 's/\r$//' apply-imx283-camgpio.sh` then `./apply-imx283-camgpio.sh` again. (The repo's `.gitattributes` keeps shell scripts as LF on future clones.)
+
+**If you ended up with nested `OneInchEye/OneInchEye`:** flatten it by moving the inner repo up:
+```bash
+cd ~/OneInchEye
+mv OneInchEye/* .
+mv OneInchEye/.git . 2>/dev/null
+mv OneInchEye/.gitignore . 2>/dev/null
+rmdir OneInchEye
+cd ~/OneInchEye
+```
+Then continue from step 2. If the script gets a 404 when fetching the overlay, try `./apply-imx283-camgpio.sh rpi-6.1.y` or see the manual steps below.
+
+If the script fails to download the overlay, see “How to apply on the Pi” below for manual steps.
 
 ---
 
@@ -101,19 +120,13 @@ You already have the patch in this repo (`imx283-overlay-camgpio.patch`). Use it
 
 ### 1. Get the stock overlay source
 
-On the Pi (or on a machine with the same kernel), get the unmodified `imx283-overlay.dts` from the Raspberry Pi kernel tree:
+The IMX283 overlay is **not** in the upstream Raspberry Pi kernel; it comes from the [imx283-v4l2-driver](https://github.com/will127534/imx283-v4l2-driver) repo. Download the unmodified overlay:
 
 ```bash
-# Clone the kernel tree (use the branch that matches your Pi’s kernel, e.g. rpi-6.6.y)
-git clone --depth 1 --branch rpi-6.6.y https://github.com/raspberrypi/linux.git rpi-linux
-cp rpi-linux/arch/arm/boot/dts/overlays/imx283-overlay.dts .
+curl -sSfL -o imx283-overlay.dts "https://raw.githubusercontent.com/will127534/imx283-v4l2-driver/master/imx283-overlay.dts"
 ```
 
-Or download the single file from GitHub (replace `rpi-6.6.y` with your kernel branch if different):
-
-```bash
-wget -O imx283-overlay.dts "https://raw.githubusercontent.com/raspberrypi/linux/rpi-6.6.y/arch/arm/boot/dts/overlays/imx283-overlay.dts"
-```
+(Or run the script in step 2 — it fetches this file automatically.)
 
 ### 2. Apply the patch and build the overlay
 
@@ -124,7 +137,7 @@ cd /path/to/OneInchEye
 ./apply-imx283-camgpio.sh
 ```
 
-This fetches the stock overlay (or uses an existing `build-overlay/imx283-overlay.dts`), applies `imx283-overlay-camgpio.patch`, and builds `build-overlay/imx283.dtbo`. Use `./apply-imx283-camgpio.sh rpi-5.15.y` if your Pi kernel is on an older branch.
+This fetches the stock overlay from the driver repo, applies `imx283-overlay-camgpio.patch` (CAMGPIO + regulator-always-on), and builds `build-overlay/imx283.dtbo`.
 
 **Option B — manual steps** (from a directory that has both the stock `imx283-overlay.dts` and the patch):
 
@@ -137,12 +150,16 @@ Install the device tree compiler if needed: `sudo apt install device-tree-compil
 
 ### 3. Install on the Pi
 
-```bash
-# Backup the original overlay
-sudo cp /boot/overlays/imx283.dtbo /boot/overlays/imx283.dtbo.bak
+On Bookworm+, overlays are loaded from `/boot/firmware/overlays/`. Install the new overlay in both places so it is used regardless of mount layout:
 
-# Install the new overlay
-sudo cp imx283.dtbo /boot/overlays/
+```bash
+# Backup and install (use the path where your build produced imx283.dtbo)
+sudo cp /boot/firmware/overlays/imx283.dtbo /boot/firmware/overlays/imx283.dtbo.bak
+sudo cp build-overlay/imx283.dtbo /boot/firmware/overlays/
+
+# If /boot/overlays is a different directory, update it too
+sudo cp /boot/overlays/imx283.dtbo /boot/overlays/imx283.dtbo.bak 2>/dev/null || true
+sudo cp build-overlay/imx283.dtbo /boot/overlays/ 2>/dev/null || true
 ```
 
 ### 4. Enable the overlay in config.txt

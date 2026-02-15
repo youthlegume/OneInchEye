@@ -1,0 +1,2 @@
+# Ensure shell scripts use LF on all platforms (fixes "bash\r: No such file or directory" on Pi)
+*.sh text eol=lf

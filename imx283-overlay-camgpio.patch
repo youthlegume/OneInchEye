@@ -8,5 +8,7 @@ index fe74183..71a253a 100644
  			startup-delay-us = <300000>;
 +			/* CM4 pin 97 (CAMGPIO / CameraGPIO) */
 +			gpio = <&expgpio 5 0>;
++			regulator-always-on;
++			regulator-boot-on;
  		};
  	};
