@@ -1,6 +1,31 @@
 # OneInchEye: OpenSource IMX283 Camera Board for Raspberry Pi
+
 ![](https://imgur.com/olbFNfe.jpg)
 ![](https://imgur.com/RlCwAG7.jpg)
+
+## This Fork
+
+This repository is a fork of [Will Whang's OneInchEye](https://github.com/will127534/OneInchEye) project. The upstream design, drivers, and documentation remain the foundation; this fork extends the project toward a broader camera platform.
+
+**Goal:** Build a family of OneInchEye-based camera variants, each tuned for a specific functional purpose (imaging style, mounting, optics, use case, etc.).
+
+**Variant 1 — System proof-of-concept (current):** Validate that the full stack works end-to-end on real hardware. A board from the current V2.1 build is running and can produce image captures via SSH. Software integration beyond basic capture has not been started yet.
+
+**In progress — C-mount lens testing:** A new mechanical mounting system has been designed (see [`3D/`](3D/)) to attach an actual C-mount lens and evaluate optical performance. This is the next hardware milestone for Variant 1.
+
+| Variant | Purpose | Status |
+|---------|---------|--------|
+| 1 — POC | Prove the system captures images on real hardware | Capture working via SSH; optics testing next |
+| 2+ | TBD — purpose-specific camera variants | Not started |
+
+### Upstream References
+
+- Original repo: https://github.com/will127534/OneInchEye
+- Blog: https://will127534.github.io/OneInchEye/
+- Quick Start Guide: https://github.com/will127534/OneInchEye/wiki/OneInchEye-Quick-Start-Guide
+
+---
+
 ### Update on 2024/03/24
 This project is also compatiable with RPI5, the quickstart guide has been updated.  
 
