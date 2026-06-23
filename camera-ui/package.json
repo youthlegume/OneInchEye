@@ -1,0 +1,15 @@
+{
+  "name": "oneincheye-camera-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OneInchEye camera control UI (kiosk target on port 3000)",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
