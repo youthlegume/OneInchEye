@@ -19,11 +19,17 @@
       }
 
       :root {
-        /* Pulled directly from the Paper "Splash" design */
-        --yellow: #fae44c;
+        /* Warmer, slightly darker than the Paper "Splash" yellow (#fae44c)
+           to counter how bright the backlight renders it. Tune to taste:
+           lighter/cooler #F3CE3C  ·  this #ECB733  ·  deeper/oranger #E5A627 */
+        --yellow: #ecb733;
         --ink: #000000;
         /* Slow, constant motion → linear (web-animation-design) */
         --scan-duration: 9s;
+        /* Compensate for the panel's horizontal mode offset (content sits too
+           far right on the glass). Negative = shift left. Tune in ~4px steps. */
+        --nudge-x: -16px;
+        --nudge-y: 0px;
       }
 
       * {
@@ -54,6 +60,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        /* Re-center content on the round glass (see --nudge-* above).
+           Background lives on <body>, so this only moves the ring + wordmark. */
+        transform: translate(var(--nudge-x), var(--nudge-y));
       }
 
       /* Focus ring: a faint static track + one thin arc that scans around it.
