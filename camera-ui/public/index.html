@@ -2,10 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=480, height=480, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=480, height=480, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>OneInchEye</title>
+    <title>Open Source Optics</title>
     <style>
+      @font-face {
+        font-family: "Suisse BP Int'l";
+        src: url("/fonts/SuisseBPIntl-Medium.otf") format("opentype");
+        font-weight: 500;
+        font-style: normal;
+        /* Bundled + offline, so block briefly rather than flash a fallback */
+        font-display: block;
+      }
+
+      :root {
+        /* Pulled directly from the Paper "Splash" design */
+        --yellow: #fae44c;
+        --ink: #000000;
+        /* Slow, constant motion → linear (web-animation-design) */
+        --scan-duration: 9s;
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
@@ -17,52 +37,96 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #000;
-        color: #fff;
-        font-family: system-ui, -apple-system, sans-serif;
+        background: var(--yellow);
+        color: var(--ink);
+        /* Crisper type on the panel (make-interfaces-feel-better #8) */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         user-select: none;
         -webkit-user-select: none;
+        /* Kiosk: no pointer */
+        cursor: none;
       }
 
-      main {
+      .stage {
+        position: fixed;
+        inset: 0;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
+      }
+
+      /* Focus ring: a faint static track + one thin arc that scans around it.
+         Inset well within the 480px circle so the bezel never crops it. */
+      .ring {
+        position: absolute;
         width: 100%;
         height: 100%;
-        gap: 1rem;
+        pointer-events: none;
+      }
+
+      .ring__track {
+        fill: none;
+        stroke: rgba(0, 0, 0, 0.08);
+        stroke-width: 2;
+      }
+
+      .ring__scan {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 2;
+        stroke-linecap: round;
+        transform-box: fill-box;
+        transform-origin: center;
+        /* Only transform is animated → composited on the GPU */
+        animation: scan var(--scan-duration) linear infinite;
+        will-change: transform;
+      }
+
+      @keyframes scan {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .wordmark {
+        position: relative;
+        z-index: 1;
+        max-width: 300px;
         text-align: center;
-        padding: 1.5rem;
+        color: var(--ink);
+        font-family: "Suisse BP Int'l", "Helvetica Neue", Helvetica, Arial,
+          "Liberation Sans", system-ui, sans-serif;
+        font-weight: 500;
+        font-size: 46px;
+        line-height: 1.04;
+        /* Tighter tracking on large type, matching the design */
+        letter-spacing: -0.02em;
+        /* Even line breaks in the circle (make-interfaces-feel-better #10) */
+        text-wrap: balance;
       }
 
-      h1 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-      }
-
-      p {
-        font-size: 0.85rem;
-        opacity: 0.65;
-        max-width: 18rem;
-        line-height: 1.4;
-      }
-
-      .dot {
-        width: 0.5rem;
-        height: 0.5rem;
-        border-radius: 50%;
-        background: #3dffb5;
-        box-shadow: 0 0 0.75rem #3dffb5;
+      /* Respect users who prefer no motion */
+      @media (prefers-reduced-motion: reduce) {
+        .ring__scan {
+          animation: none;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <div class="dot" aria-hidden="true"></div>
-      <h1>OneInchEye</h1>
-      <p>Kiosk boot OK. Replace this page with live preview and ISO / shutter controls.</p>
-    </main>
+    <div class="stage">
+      <svg class="ring" viewBox="0 0 480 480" aria-hidden="true">
+        <circle class="ring__track" cx="240" cy="240" r="206" />
+        <circle
+          class="ring__scan"
+          cx="240"
+          cy="240"
+          r="206"
+          stroke-dasharray="64 1230"
+        />
+      </svg>
+      <h1 class="wordmark">Open Source Optics</h1>
+    </div>
   </body>
 </html>

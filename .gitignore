@@ -26,3 +26,4 @@ fp-info-cache
 
 # Camera UI
 camera-ui/node_modules/
+camera-ui/public/fonts/*.otf
