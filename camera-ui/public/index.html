@@ -60,6 +60,7 @@
          Inset well within the 480px circle so the bezel never crops it. */
       .ring {
         position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         pointer-events: none;
@@ -92,18 +93,18 @@
       .wordmark {
         position: relative;
         z-index: 1;
-        max-width: 300px;
+        /* Single line, matching the Paper design */
+        white-space: nowrap;
         text-align: center;
         color: var(--ink);
         font-family: "Suisse BP Int'l", "Helvetica Neue", Helvetica, Arial,
           "Liberation Sans", system-ui, sans-serif;
         font-weight: 500;
-        font-size: 46px;
+        /* Sized so the one-line wordmark sits comfortably inside the ring */
+        font-size: 40px;
         line-height: 1.04;
         /* Tighter tracking on large type, matching the design */
         letter-spacing: -0.02em;
-        /* Even line breaks in the circle (make-interfaces-feel-better #10) */
-        text-wrap: balance;
       }
 
       /* Respect users who prefer no motion */
