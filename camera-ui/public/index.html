@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=480, height=480, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Open Source Optics</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        user-select: none;
+        -webkit-user-select: none;
+        cursor: none;
+      }
+
+      .loop {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        /* Fill the round panel edge-to-edge; crops a hair off a side */
+        object-fit: cover;
+        object-position: center;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Relative path so it works under both http:// and file:// -->
+    <img class="loop" src="Loop.gif" alt="" aria-hidden="true" />
+  </body>
+</html>

@@ -1,0 +1,11 @@
+# Ensure scripts/markup use LF on all platforms (fixes "bash\r: No such file or
+# directory" and CRLF surprises on the Pi)
+*.sh   text eol=lf
+*.html text eol=lf
+*.js   text eol=lf
+
+# Binary assets — never normalize
+*.gif binary
+*.otf binary
+*.png binary
+*.jpg binary

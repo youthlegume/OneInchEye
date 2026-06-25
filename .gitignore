@@ -23,3 +23,7 @@ fp-info-cache
 
 # Exported BOM files
 *.xml
+
+# Camera UI
+camera-ui/node_modules/
+camera-ui/public/fonts/*.otf

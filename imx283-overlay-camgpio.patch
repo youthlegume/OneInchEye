@@ -1,0 +1,14 @@
+diff --git a/imx283-overlay.dts b/imx283-overlay.dts
+index fe74183..71a253a 100644
+--- a/imx283-overlay.dts
++++ b/imx283-overlay.dts
+@@ -31,6 +31,9 @@ reg_frag: fragment@3 {
+ 		target = <&cam1_reg>;
+ 		cam_reg: __overlay__ {
+ 			startup-delay-us = <300000>;
++			/* CM4 pin 97 (CAMGPIO / CameraGPIO) */
++			gpio = <&expgpio 5 0>;
++			regulator-always-on;
++			regulator-boot-on;
+ 		};
+ 	};
