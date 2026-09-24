@@ -46,3 +46,7 @@ This folder is a placeholder shell. Replace `public/index.html` and add API rout
 - Live view (Picamera2 MJPEG or WebRTC)
 - ISO, shutter, exposure controls
 - Capture / record
+
+---
+
+**See also:** [`docs/BOOT_SPLASH_AND_NATIVE_RIVE.md`](../docs/BOOT_SPLASH_AND_NATIVE_RIVE.md) — Boot splash/Plymouth setup and native Rive direction for the kiosk UI.
